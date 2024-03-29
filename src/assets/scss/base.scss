@@ -1,3 +1,5 @@
+@use './mixins';
+
 :root {
   --primary-1: #3498db;
   --primary-2: #2980b9;
@@ -151,6 +153,12 @@ label {
 
 .m-30 {
   margin: 30px;
+}
+
+.hide-xs {
+  @include mixins.xs {
+    display: none;
+  }
 }
 
 // buttons

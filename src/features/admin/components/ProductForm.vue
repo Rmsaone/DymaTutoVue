@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useForm, useField } from 'vee-validate';
 import { z } from 'zod';
-import { toFormValidator } from '@vee-validate/zod';
+import { toTypedSchema } from '@vee-validate/zod';
+import { onMounted, ref } from 'vue';
 
 const required = { required_error: 'Veuillez renseigner ce champ' };
-const validationSchema = toFormValidator(
+const validationSchema = toTypedSchema(
   z.object({
     title: z
       .string(required)
@@ -21,6 +22,10 @@ const validationSchema = toFormValidator(
     category: z.string(required),
   })
 );
+const firstInput = ref<HTMLInputElement | null>(null);
+onMounted(() => {
+  firstInput.value?.focus();
+});
 
 const { handleSubmit, isSubmitting } = useForm({
   validationSchema,
@@ -32,8 +37,20 @@ const price = useField('price');
 const description = useField('description');
 const category = useField('category');
 
-const trySubmit = handleSubmit((formValues) => {
-  console.log(formValues);
+const trySubmit = handleSubmit(async (formValues, { resetForm }) => {
+  try {
+    await fetch('https://restapi.fr/api/projetproducts', {
+      method: 'POST',
+      body: JSON.stringify(formValues),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    resetForm();
+    firstInput.value?.focus();
+  } catch (e) {
+    console.log(e);
+  }
 });
 </script>
 
